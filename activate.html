@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DayDraft — Activate Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0b0f1a; --bg2: #111827; --bg3: #1a2233;
+  --surface: #162032; --surface2: #1c2a3d;
+  --border: #1f3050; --border2: #243650;
+  --text: #e8edf5; --text2: #7a93b5; --text3: #4a6080;
+  --accent: #3b82f6; --pro: #f59e0b; --green: #10b981;
+  --radius: 14px; --radius-sm: 8px;
+}
+html, body { min-height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body::before {
+  content: ''; position: fixed; inset: 0;
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 40px 40px; opacity: 0.15; pointer-events: none; z-index: 0;
+}
+.page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
+.logo-bar { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+.logo-icon { width: 36px; height: 36px; background: var(--surface); border: 1px solid var(--border2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.logo-text { font-size: 20px; font-weight: 600; letter-spacing: -0.5px; }
+.pro-badge { background: var(--pro); color: #000; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; letter-spacing: 0.5px; }
+.card { background: var(--bg2); border: 1px solid var(--border2); border-radius: 20px; padding: 36px 32px; width: 100%; max-width: 460px; text-align: center; }
+.hero-icon { width: 64px; height: 64px; background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.25); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 28px; }
+.card h1 { font-size: 22px; font-weight: 600; margin-bottom: 8px; letter-spacing: -0.3px; }
+.card .subtitle { font-size: 14px; color: var(--text2); margin-bottom: 24px; line-height: 1.6; }
+.email-notice { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px 16px; margin-bottom: 24px; display: flex; gap: 12px; align-items: flex-start; text-align: left; }
+.notice-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+.notice-text { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.notice-text strong { color: var(--text); font-weight: 500; }
+.features { list-style: none; display: flex; flex-direction: column; gap: 7px; margin-bottom: 24px; text-align: left; }
+.features li { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 10px; }
+.features li .chk { color: var(--pro); font-size: 11px; flex-shrink: 0; }
+.divider { display: flex; align-items: center; gap: 12px; font-size: 11px; color: var(--text3); margin-bottom: 18px; }
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.input-label { font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; color: var(--text3); text-align: left; display: block; margin-bottom: 8px; }
+.key-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.key-input { flex: 1; padding: 12px 14px; background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Mono', monospace; font-size: 13px; outline: none; transition: border-color 0.15s; }
+.key-input:focus { border-color: var(--accent); }
+.key-input::placeholder { color: var(--text3); font-family: 'DM Sans', sans-serif; }
+.btn-activate { padding: 12px 18px; background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+.btn-activate:hover { background: #2563eb; transform: translateY(-1px); }
+.btn-activate:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.key-hint { font-size: 12px; color: var(--text3); text-align: left; }
+.key-error { font-size: 12px; color: #f87171; text-align: left; display: none; margin-top: 6px; }
+.success-state { display: none; flex-direction: column; align-items: center; gap: 10px; padding: 12px 0 4px; }
+.success-check { width: 56px; height: 56px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.success-title { font-size: 18px; font-weight: 600; }
+.success-sub { font-size: 13px; color: var(--text2); }
+.btn-open { width: 100%; padding: 13px; background: var(--green); color: #000; border: none; border-radius: var(--radius-sm); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; margin-top: 6px; }
+.btn-open:hover { background: #34d399; transform: translateY(-1px); }
+.contact-line { margin-top: 24px; font-size: 13px; color: var(--text3); }
+.contact-line a { color: var(--accent); text-decoration: none; }
+.contact-line a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="logo-bar">
+    <div class="logo-icon">📅</div>
+    <span class="logo-text">DayDraft</span>
+    <span class="pro-badge">PRO</span>
+  </div>
+
+  <div class="card">
+    <div class="hero-icon">✦</div>
+    <h1>You're almost there</h1>
+    <p class="subtitle">Thanks for upgrading to DayDraft Pro. Your license key has been sent to your email — paste it below to unlock everything instantly.</p>
+
+    <div class="email-notice">
+      <div class="notice-icon">📩</div>
+      <div class="notice-text">
+        <strong>Check your email</strong> — Selar sent your key to the address you used at checkout. Check your spam folder if you don't see it within a minute.
+      </div>
+    </div>
+
+    <ul class="features">
+      <li><span class="chk">✦</span> Weekly 7-day overview</li>
+      <li><span class="chk">✦</span> Recurring tasks — daily, weekly, custom days</li>
+      <li><span class="chk">✦</span> Custom categories with your own colors</li>
+      <li><span class="chk">✦</span> Export schedule as PDF</li>
+      <li><span class="chk">✦</span> Custom accent color &amp; 4 extra themes</li>
+    </ul>
+
+    <div class="divider">paste your key below</div>
+
+    <div id="activate-form">
+      <label class="input-label">License Key</label>
+      <div class="key-row">
+        <input class="key-input" id="key-input" type="text" placeholder="DD26-XXXX-XXXX-XXXX" spellcheck="false" autocomplete="off" />
+        <button class="btn-activate" id="activate-btn" onclick="activate()">Activate</button>
+      </div>
+      <div class="key-error" id="key-error">Invalid key — double check and try again.</div>
+      <div class="key-hint">Your key looks like: DD26-XXXX-XXXX-XXXX</div>
+    </div>
+
+    <div class="success-state" id="success-state">
+      <div class="success-check">✓</div>
+      <div class="success-title">Pro activated!</div>
+      <div class="success-sub">Taking you to DayDraft now…</div>
+      <button class="btn-open" onclick="openApp()">Open DayDraft</button>
+    </div>
+
+    <div class="contact-line">
+      Didn't get your key? <a href="mailto:YOUR_EMAIL_HERE">Contact support</a>
+    </div>
+  </div>
+
+</div>
+<script>
+// Replace with your actual secret seed — must match the one in index.html and the keygen
+const DAYDRAFT_SECRET = 'replace-this-with-your-actual-secret-seed';
+const APP_URL = 'https://danxdigitals.github.io/daydraft/';
+
+async function sha256(msg) {
+  const buf = new TextEncoder().encode(msg);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function toB36Seg(hex, len) {
+  return parseInt(hex.substring(0,8),16).toString(36).toUpperCase().padStart(len,'0').substring(0,len);
+}
+async function isValidKey(key) {
+  const parts = key.toUpperCase().trim().split('-');
+  if (parts.length !== 4) return false;
+  const [pfx, s1, s2, sig] = parts;
+  if (s1.length!==4||s2.length!==4||sig.length!==4) return false;
+  const hash = await sha256(`${pfx}-${s1}-${s2}-${DAYDRAFT_SECRET}`);
+  return toB36Seg(hash,4) === sig;
+}
+
+async function activate() {
+  const val = document.getElementById('key-input').value.trim().toUpperCase();
+  const err = document.getElementById('key-error');
+  const btn = document.getElementById('activate-btn');
+  if (!val) return;
+  btn.textContent = 'Checking…'; btn.disabled = true;
+  const valid = await isValidKey(val);
+  if (valid) {
+    localStorage.setItem('dd_pro', '1');
+    localStorage.setItem('dd_key', val);
+    document.getElementById('activate-form').style.display = 'none';
+    const s = document.getElementById('success-state');
+    s.style.display = 'flex';
+    setTimeout(() => openApp(), 2000);
+  } else {
+    btn.textContent = 'Activate'; btn.disabled = false;
+    err.style.display = 'block';
+    document.getElementById('key-input').style.borderColor = '#f87171';
+    setTimeout(() => { err.style.display='none'; document.getElementById('key-input').style.borderColor=''; }, 3000);
+  }
+}
+function openApp() { window.location.href = APP_URL; }
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('key-input').addEventListener('keydown', e => { if (e.key==='Enter') activate(); });
+});
+</script>
+</body>
+</html>
