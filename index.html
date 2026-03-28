@@ -1411,12 +1411,6 @@ function savePlan() {
   document.getElementById('plan-modal').classList.remove('open');
   render();
 }
-  function toggleReminder() {
-  reminderOn = !reminderOn;
-  document.getElementById('reminder-toggle').classList.toggle('on', reminderOn);
-  document.getElementById('reminder-time').style.display = reminderOn ? 'block' : 'none';
-  if (reminderOn) requestNotifPermission();
-}
 
 function clearPlan() {
   const key = dateKey(currentDate);
