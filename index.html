@@ -559,7 +559,22 @@ input[type="color"].cat-color-pick {
 }
 .btn-activate:hover { border-color: var(--pro); color: var(--pro); }
 .key-hint { font-size: 11px; color: var(--text3); }
-.key-error { font-size: 11px; color: #f87171; display: none; margin-top: 6px; }
+.bg-notice {
+  display: flex; gap: 10px; align-items: flex-start;
+  background: rgba(59,130,246,0.07);
+  border: 1px solid rgba(59,130,246,0.2);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  margin-bottom: 16px; animation: noticeIn 0.3s ease;
+}
+@keyframes noticeIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+.notice-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.notice-body { flex: 1; }
+.notice-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.notice-text { font-size: 11px; color: var(--text2); line-height: 1.5; }
+.notice-text strong { color: var(--text); }
+.notice-dismiss { background: none; border: none; color: var(--text3); font-size: 16px; cursor: pointer; padding: 0; line-height: 1; flex-shrink: 0; }
+.notice-dismiss:hover { color: var(--text); }
+  .key-error { font-size: 11px; color: #f87171; display: none; margin-top: 6px; }
 </style>
 </head>
 <body>
@@ -624,6 +639,18 @@ input[type="color"].cat-color-pick {
         <span class="toggle-label">Remind me</span>
       </div>
       <input type="time" class="reminder-time-input" id="reminder-time" style="display:none" />
+      <div class="bg-notice" id="bg-notice" style="display:none">
+  <span class="notice-icon">💡</span>
+  <div class="notice-body">
+    <div class="notice-title">Keep browser running for reminders</div>
+    <div class="notice-text">
+      Reminders only fire while your browser is open.
+      On <strong>Edge:</strong> Settings → Apps → DayDraft → Run in background → Always<br>
+On <strong>Chrome:</strong> Settings → Privacy and security → Site Settings → danxdigitals.github.io → Notifications → Allow
+    </div>
+  </div>
+  <button class="notice-dismiss" onclick="dismissNotice()">×</button>
+</div>
     </div>
 
     <!-- Recurring (Pro) -->
@@ -1302,7 +1329,20 @@ function toggleReminder() {
   reminderOn = !reminderOn;
   document.getElementById('reminder-toggle').classList.toggle('on', reminderOn);
   document.getElementById('reminder-time').style.display = reminderOn ? 'block' : 'none';
-  if (reminderOn) requestNotifPermission();
+  if (reminderOn) {
+    requestNotifPermission();
+    // Show notice only if never dismissed before
+    if (!localStorage.getItem('dd_notice_dismissed')) {
+      document.getElementById('bg-notice').style.display = 'flex';
+    }
+  } else {
+    document.getElementById('bg-notice').style.display = 'none';
+  }
+}
+
+function dismissNotice() {
+  localStorage.setItem('dd_notice_dismissed', '1');
+  document.getElementById('bg-notice').style.display = 'none';
 }
 
 function openPlanModal(hour) {
