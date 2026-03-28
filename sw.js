@@ -45,6 +45,12 @@ self.addEventListener('message', e => {
   }
 });
 
+self.addEventListener('periodicsync', e => {
+  if (e.tag === 'check-reminders') {
+    e.waitUntil(checkAndNotify());
+  }
+});
+
 // Notification click — focus or open the app
 self.addEventListener('notificationclick', e => {
   e.notification.close();
