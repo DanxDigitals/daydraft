@@ -1559,12 +1559,15 @@ if (Notification.permission === 'default') {
 In index.html — after SW registers
 const reg = await navigator.serviceWorker.ready;
   
-if ('periodicSync' in reg) {
-  await reg.periodicSync.register('check-reminders', {
-    minInterval: 60 * 1000 // every 60 seconds
-  });
-}
-
+// Register periodic background sync
+navigator.serviceWorker.ready.then(reg => {
+  if ('periodicSync' in reg) {
+    reg.periodicSync.register('check-reminders', {
+      minInterval: 60 * 1000
+    }).catch(() => {}); // silently fail if permission denied
+  }
+});
+  
 setTheme(currentTheme);
 if (isPro) setAccentColor(currentAccent);
 updateProUI();
