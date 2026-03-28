@@ -1556,13 +1556,14 @@ if ('serviceWorker' in navigator) {
 if (Notification.permission === 'default') {
   setTimeout(() => Notification.requestPermission(), 2000);
 }
-// In index.html — after SW registers
-// const reg = await navigator.serviceWorker.ready;
-// if ('periodicSync' in reg) {
-//   await reg.periodicSync.register('check-reminders', {
-//     minInterval: 60 * 1000 // every 60 seconds
-//   });
-// }
+In index.html — after SW registers
+const reg = await navigator.serviceWorker.ready;
+  
+if ('periodicSync' in reg) {
+  await reg.periodicSync.register('check-reminders', {
+    minInterval: 60 * 1000 // every 60 seconds
+  });
+}
 
 setTheme(currentTheme);
 if (isPro) setAccentColor(currentAccent);
