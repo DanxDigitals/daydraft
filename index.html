@@ -1411,6 +1411,12 @@ function savePlan() {
   document.getElementById('plan-modal').classList.remove('open');
   render();
 }
+  function toggleReminder() {
+  reminderOn = !reminderOn;
+  document.getElementById('reminder-toggle').classList.toggle('on', reminderOn);
+  document.getElementById('reminder-time').style.display = reminderOn ? 'block' : 'none';
+  if (reminderOn) requestNotifPermission();
+}
 
 function clearPlan() {
   const key = dateKey(currentDate);
@@ -1551,12 +1557,12 @@ if (Notification.permission === 'default') {
   setTimeout(() => Notification.requestPermission(), 2000);
 }
 // In index.html — after SW registers
-const reg = await navigator.serviceWorker.ready;
-if ('periodicSync' in reg) {
-  await reg.periodicSync.register('check-reminders', {
-    minInterval: 60 * 1000 // every 60 seconds
-  });
-}
+// const reg = await navigator.serviceWorker.ready;
+// if ('periodicSync' in reg) {
+//   await reg.periodicSync.register('check-reminders', {
+//     minInterval: 60 * 1000 // every 60 seconds
+//   });
+// }
 
 setTheme(currentTheme);
 if (isPro) setAccentColor(currentAccent);
