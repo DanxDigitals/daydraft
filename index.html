@@ -1550,18 +1550,29 @@ if ('serviceWorker' in navigator) {
 if (Notification.permission === 'default') {
   setTimeout(() => Notification.requestPermission(), 2000);
 }
-In index.html — after SW registers
-const reg = await navigator.serviceWorker.ready;
-  
-// Register periodic background sync
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    console.log('DayDraft SW registered', reg.scope);
+  }).catch(err => console.log('SW registration failed', err));
+}
+
+if (Notification.permission === 'default') {
+  setTimeout(() => Notification.requestPermission(), 2000);
+}
+
 navigator.serviceWorker.ready.then(reg => {
   if ('periodicSync' in reg) {
     reg.periodicSync.register('check-reminders', {
       minInterval: 60 * 1000
-    }).catch(() => {}); // silently fail if permission denied
+    }).catch(() => {});
   }
 });
-  
+
+setTheme(currentTheme);
+if (isPro) setAccentColor(currentAccent);
+updateProUI();
+startReminderChecker();
+render();
 setTheme(currentTheme);
 if (isPro) setAccentColor(currentAccent);
 updateProUI();
