@@ -560,6 +560,17 @@ input[type="color"].cat-color-pick {
 .btn-activate:hover { border-color: var(--pro); color: var(--pro); }
 .key-hint { font-size: 11px; color: var(--text3); }
 .key-error { font-size: 11px; color: #f87171; display: none; margin-top: 6px; }
+
+@keyframes slideOutLeft  { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(-40px); } }
+@keyframes slideOutRight { from { opacity:1; transform:translateX(0); } to { opacity:0; transform:translateX(40px); } }
+@keyframes slideInRight  { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
+@keyframes slideInLeft   { from { opacity:0; transform:translateX(-40px); } to { opacity:1; transform:none; } }
+
+.slide-out-left  { animation: slideOutLeft  0.2s ease forwards; }
+.slide-out-right { animation: slideOutRight 0.2s ease forwards; }
+.slide-in-right  { animation: slideInRight  0.3s ease forwards; }
+.slide-in-left   { animation: slideInLeft   0.3s ease forwards; }
+  
 </style>
 </head>
 <body>
@@ -1279,9 +1290,20 @@ function updateSlotCount() {
 //  NAVIGATION
 // ═══════════════════════════════════════════════
 function navigate(dir) {
-  if (view==='daily') currentDate.setDate(currentDate.getDate()+dir);
-  else currentDate.setDate(currentDate.getDate()+dir*7);
-  render();
+  const main = document.getElementById('main-content');
+  const outClass = dir > 0 ? 'slide-out-left' : 'slide-out-right';
+  const inClass  = dir > 0 ? 'slide-in-right' : 'slide-in-left';
+
+  main.classList.add(outClass);
+
+  setTimeout(() => {
+    main.classList.remove(outClass);
+    if (view === 'daily') currentDate.setDate(currentDate.getDate() + dir);
+    else currentDate.setDate(currentDate.getDate() + dir * 7);
+    render();
+    main.classList.add(inClass);
+    setTimeout(() => main.classList.remove(inClass), 300);
+  }, 200);
 }
 function goToDay(key) {
   const [y,m,d] = key.split('-').map(Number);
