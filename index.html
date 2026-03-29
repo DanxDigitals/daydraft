@@ -1095,30 +1095,40 @@ function startReminderChecker() {
 function checkReminders() {
   const now = new Date();
   const nowSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
-
   const today = dateKey(now);
   const allPlans = [];
 
-  // Explicit plans for today
-  Object.entries(plans[today] || {}).forEach(([h, p]) => {
-    if (p.reminder && p.reminderTime) allPlans.push({ hour:+h, ...p });
+  // ── Auto-remind at slot start time for every planned slot ──
+  const allSlots = [];
+  HOURS.forEach(h => { allSlots.push(h); allSlots.push(h + 0.5); });
+  allSlots.forEach(h => {
+    const p = getPlanForSlot(now, h);
+    if (p && !p.isContinuation) {
+      const whole = Math.floor(h);
+      const mins = (h % 1 === 0.5) ? 30 : 0;
+      allPlans.push({ hour: h, task: p.task, reminderTime: `${String(whole).padStart(2,'0')}:${String(mins).padStart(2,'0')}`, isAuto: true });
+    }
   });
 
-  // Recurring plans for today
+  // ── Manual remind me reminders ──
+  Object.entries(plans[today] || {}).forEach(([h, p]) => {
+    if (p.reminder && p.reminderTime) {
+      allPlans.push({ hour: +h, ...p, isAuto: false });
+    }
+  });
   recurrers.forEach(r => {
     if (r.reminder && r.reminderTime) {
       const p = getPlanForSlot(now, r.hour);
-      if (p && p.isRecurring) allPlans.push({ hour: r.hour, ...r });
+      if (p && p.isRecurring) allPlans.push({ hour: r.hour, ...r, isAuto: false });
     }
   });
 
   allPlans.forEach(p => {
     const [rh, rm] = p.reminderTime.split(':').map(Number);
-    const targetSec = rh * 3600 + rm * 60; // exact second the reminder should fire
+    const targetSec = rh * 3600 + rm * 60;
     const diff = nowSec - targetSec;
-    // Fire if we're within 0–14 seconds past the target (covers the 5s check interval with margin)
     if (diff >= 0 && diff < 15) {
-      const firedKey = `dd_rem_${today}_${p.reminderTime}_${p.hour}`;
+      const firedKey = `dd_rem_${today}_${p.reminderTime}_${p.hour}_${p.isAuto?'auto':'manual'}`;
       const fired = localStorage.getItem(firedKey);
       if (!fired) {
         localStorage.setItem(firedKey, '1');
@@ -1127,7 +1137,6 @@ function checkReminders() {
     }
   });
 }
-
 function fireReminder(hour, task, time) {
   showToast(hour, task);
   const title = `DayDraft — ${formatHour(hour)}`;
