@@ -1360,6 +1360,48 @@ function buildCatPills() {
   });
 }
 
+// ── DURATION ──
+function selectDuration(el) {
+  selDuration = parseFloat(el.dataset.d);
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('sel', parseFloat(b.dataset.d) === selDuration));
+}
+function syncDurationBtns() {
+  document.querySelectorAll('.dur-btn').forEach(b => b.classList.toggle('sel', parseFloat(b.dataset.d) === selDuration));
+}
+
+function selectRecur(el){ selRecur=el.dataset.r; document.querySelectorAll('.recur-btn').forEach(b=>b.classList.toggle('sel',b.dataset.r===selRecur)); document.getElementById('day-picker').style.display=selRecur==='custom'?'flex':'none'; }
+function toggleDay(el){ const d=el.dataset.d; if(selDays.includes(d)) selDays=selDays.filter(x=>x!==d); else selDays.push(d); el.classList.toggle('sel',selDays.includes(d)); }
+function toggleReminder(){ reminderOn=!reminderOn; document.getElementById('reminder-toggle').classList.toggle('on',reminderOn); document.getElementById('reminder-time').style.display=reminderOn?'block':'none'; if(reminderOn) requestNotifPermission(); }
+
+function openPlanModal(hour) {
+  // If tapping a continuation slot, hour is the blockStart — open the actual plan
+  activeSlot = hour;
+  const key = dateKey(currentDate);
+  const plan = (plans[key]||{})[hour] || {};
+  selCat     = plan.category || 'None';
+  selRecur   = plan.recur    || 'none';
+  selDays    = plan.days ? [...plan.days] : [];
+  reminderOn = !!plan.reminder;
+  selDuration= plan.duration || 0.5;
+
+  document.getElementById('modal-time').textContent = formatHour(hour);
+  document.getElementById('modal-date').textContent = formatDate(currentDate,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  document.getElementById('modal-plan').value = plan.task || '';
+  document.getElementById('reminder-toggle').classList.toggle('on', reminderOn);
+  document.getElementById('reminder-time').style.display = reminderOn ? 'block' : 'none';
+  document.getElementById('reminder-time').value = plan.reminderTime || `${String(Math.floor(hour)).padStart(2,'0')}:00`;
+
+  buildCatPills();
+  syncDurationBtns();
+  document.querySelectorAll('.recur-btn').forEach(b=>b.classList.toggle('sel',b.dataset.r===selRecur));
+  document.getElementById('day-picker').style.display = selRecur==='custom'?'flex':'none';
+  document.querySelectorAll('.day-btn').forEach(b=>b.classList.toggle('sel',selDays.includes(b.dataset.d)));
+  document.getElementById('plan-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-plan').focus(),80);
+}
+function closePlanModal(e){ if(e&&e.target!==document.getElementById('plan-modal')) return;
+document.getElementById('plan-modal').classList.remove('open'); }
+
 function applyPillSelected(btn, cat) {
   const cls = BASE_CATS.includes(cat) ? `sel-${cat.toLowerCase()}` : 'sel-custom';
   btn.classList.add(cls);
@@ -1425,11 +1467,6 @@ function openPlanModal(hour) {
 
   document.getElementById('plan-modal').classList.add('open');
   setTimeout(() => document.getElementById('modal-plan').focus(), 80);
-}
-
-function closePlanModal(e) {
-  if (e && e.target !== document.getElementById('plan-modal')) return;
-  document.getElementById('plan-modal').classList.remove('open');
 }
 
 function savePlan() {
